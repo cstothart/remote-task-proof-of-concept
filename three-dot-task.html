@@ -1,0 +1,473 @@
+<html>
+
+<!-- 
+
+AUTHOR: 
+
+Cary Stothart
+
+DATE: 
+
+9 Jan 2020
+
+-->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dot Task</title>
+    <style>
+    html, body {
+        background-color: #000000;
+        font-size: 65px;
+        font-weight: bold;
+        font-family: sans-serif;
+        color: #FFFFFF;
+    }
+    #instructions {
+        font-size: 20px;
+        color: #FFFFFF;
+        width: 45%;
+        margin: 0 auto;
+    }
+    #parent {
+        width: 100%;
+        margin: 0 auto;
+        height: 100%;
+        display: table;
+        text-align: center;
+    }
+    #parent > #child {
+        display: table-cell;
+        vertical-align: middle;
+    }    
+    .button {
+        background-color: #FFFFFF;
+        border: 3px solid #FFFFFF;
+        color: #000000;
+        border-radius: 8px;
+        padding: 6px 25px;
+        font-size: 40px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        -webkit-transition-duration: 0.4s; /* Safari */
+        transition-duration: 0.4s;
+    }
+    .button:hover {
+        background-color: #999999;
+        color: #000000;
+        cursor: pointer;
+    }
+    .side_by_side_container {
+        width: 840px;
+        display: inline-block;
+
+    }
+    .side_by_side_item {
+        width: 120px;
+        float: left;
+    }
+    #dotContainer {
+        width: 800px;
+        display: inline-block;
+    }
+    .singleDotContainer {
+        width: 200px;
+        height: 200px;
+        float: left;
+    }
+    .dot {
+        width: 200px;
+        height: 200px;
+        border-radius: 200px;
+    }
+    .dotSpacer {
+        width: 100px;
+        height: 210px;
+        float: left;
+        background-color: #000000;
+    }
+    #scoreContainer {
+        height: 100px;
+        margin-bottom: 50px;
+    }
+    #score {
+        font-size: 65px;
+        font-weight: bold;
+        font-family: sans-serif;
+        color: #ffffff;
+    }
+    .highlight {
+        color: yellow;
+    }
+    .left {
+        text-align: left;
+    }
+    .smallFont {
+        font-size: 14px;
+    }
+
+    </style>
+</head>
+<body>
+    <div id="parent">
+        <div id="child">
+        
+            <div id="instructions">
+
+<div class="left smallFont">
+  SURVEY APPROVAL AUTHORITY:
+  U.S. ARMY RECORDS MANAGEMENT AND DECLASSIFICATION AGENCY 
+  SURVEY CONTROL NUMBER: AAHS-RDR-PR-20-010
+  AGENCY IDENTIFIER:  DAPE-ARI 
+  Expiration Date:  12/19/2020
+</div>
+<br /><br />
+
+
+		INSTRUCTIONS<br /><br />
+            
+                You will see a number of displays and each display will contain 3 dots.<br /><br />
+                
+                In each display, 1 dot will be made the correct dot and the other 2 dots will be made the incorrect dots.<br /><br />
+                
+                Your task is to click the correct dot.<br /><br />
+                
+                <span class="highlight">For <span id="probOfRule"></span> of displays, the software will choose the correct dot according to a rule, and the rule may change while you complete the task. For the other <span id="probOfNoRule"></span> of displays, the software will choose randomly</span>.<br /><br />
+                
+                You will receive 1 point for every correct dot you click, and you will lose 1 point for every incorrect dot you click.<br /><br />
+                
+                The task will end once you earn <span id="pointsToWin"></span> points.<br /><br />
+		
+		The task will end once you reach a good level of performance<br><br>
+                
+                Press the button below when you are ready to start.
+                
+                <br /><br />
+            
+            </div>
+        
+            <div class="button" id="startButton">START</div>
+        
+            <div id="scoreContainer"> 
+                <span id="score">0</span>
+            </div>
+            
+            <div id="dotContainer">
+
+                <div class="singleDotContainer">
+                    <div class="dot" id="leftDot"></div>
+                </div>
+                <div class="dotSpacer"></div>
+                <div class="singleDotContainer">
+                    <div class="dot" id="middleDot"></div>
+                </div>
+                <div class="dotSpacer"></div>
+                <div class="singleDotContainer">
+                    <div class="dot" id="rightDot"></div>
+                </div>
+                
+            </div>
+            
+            <textarea rows="20" cols="100" id="dataBox"></textarea>
+            
+        </div>
+    </div>
+
+    <script src="libraries\jquery-3.4.1.min.js"></script>
+    <script src="libraries\jquery-ui-1.12.1\jquery-ui.js"></script>
+    <script>
+    $(document).ready(function() {
+    
+        // TASK SETUP
+        
+        var N_POINTS_TO_WIN = 30,
+            N_POINTS_TO_RULE_CHANGE = 99999,
+            PROB_OF_CORRECT_IF_RULE_CORRECT = 0.90,
+            RULES = ["Rule 1", "Rule 2", "Rule 3"],
+            DOT_COLOR_1 = "rgb(255, 0, 0)",
+            DOT_COLOR_2 = "rgb(0, 255, 0)",
+            DOT_COLOR_3 = "rgb(0, 0, 255)",
+            DOT_COLORS = [DOT_COLOR_1, DOT_COLOR_2, DOT_COLOR_3];
+            ID = Math.round(Math.random()*100000)
+         
+        // VARIABLES
+        
+        var nPoints = 0,
+            nTotalClicks = 0,
+            nCorrectClicks = 0,
+            nIncorrectClicks = 0,
+            nRuleCorrectClicks = 0,
+            nRuleIncorrectClicks = 0,
+            nRuleCorrectFirstClicks = 0,
+            ruleChanged = false,
+            currentRule = RULES[Math.floor(Math.random() * RULES.length)],
+            ruleCorrectPos = "",
+            keyDot = "",
+            keyDotColor = "",
+            correctPos = "",
+            trialNumber = 0,
+            readyForClicks = false,
+            lastClickTime = 0,
+            currentClickTime = 0,
+            trialStartTime = 0,
+            trialEndTime = 0,
+            timeToFirstClick = 0,
+            data = "id\ttrial_number\tcurrent_rule\tscore\tn_rule_correct_first_clicks\tn_rule_correct_clicks\tn_clicks\tstart_time\tend_time\ttime_to_first_click\trule_correct_dot\tcorrect_dot\n";
+            
+        // UTILITY FUNCTIONS
+        
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+            while (0 !== currentIndex) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+            return array;
+        }
+        
+        function openFullscreen() {
+            var container = document.getElementById("parent");
+            if (container.requestFullscreen) {
+                container.requestFullscreen();
+            } else if (container.mozRequestFullScreen) {
+                container.mozRequestFullScreen();
+            } else if (container.webkitRequestFullscreen) { 
+                container.webkitRequestFullscreen();
+            } else if (container.msRequestFullscreen) {
+                container.msRequestFullscreen();
+            }
+        }
+        
+        // TASK FUNCTION
+        
+        function updateScore(correctClick) {
+            if(!correctClick) {
+                $("#score").html("-1");
+                $("#score").css("color", "#FF0000")
+            }
+            else {
+                $("#score").html("+1");
+                $("#score").css("color", "#00FF00")
+            }
+            $("#score").animate({"zoom": 1.75}, 250, function() {
+                $(this).animate({"zoom": 1}, 250, function() {
+                    $("#score").html(nPoints);
+                    $("#score").css("color", "#FFFFFF")
+                });
+            });
+        }
+        
+        function startTrial() {
+            var dot_colors_copy = DOT_COLORS;
+            trialTime = 0;
+            nTotalClicks = 0;
+            nCorrectClicks = 0;
+            nIncorrectClicks = 0;
+            nRuleCorrectClicks = 0;
+            nRuleIncorrectClicks = 0;
+            timeToFirstClick = 0;
+            trialNumber += 1;
+            dot_colors_copy = shuffle(dot_colors_copy);
+            $("#rightDot").css("background-color", dot_colors_copy[0]);
+            $("#middleDot").css("background-color", dot_colors_copy[1]);
+            $("#leftDot").css("background-color", dot_colors_copy[2]);
+            $("#rightDot").delay(500).show("drop", {direction: "up"});
+            $("#middleDot").delay(750).show("drop", {direction: "up"});
+            $("#leftDot").delay(1000).show("drop", {direction: "up"}, function() {
+                readyForClicks = true;
+                trialStartTime = new Date().getTime();
+            });
+            if(currentRule == "Rule 1") {
+                keyDot = "middleDot";
+                if($("#middleDot").css("background-color") == "rgb(0, 0, 255)") {
+                    ruleCorrectPos = "rightDot";
+                }
+                else if($("#middleDot").css("background-color") == "rgb(255, 0, 0)") {
+                    ruleCorrectPos = "leftDot";
+                }
+                else if($("#middleDot").css("background-color") == "rgb(0, 255, 0)") {
+                    ruleCorrectPos = "middleDot";
+                }
+            } else if(currentRule == "Rule 2") {
+                keyDot = "leftDot";
+                if($("#leftDot").css("background-color") == "rgb(0, 0, 255)") {
+                    ruleCorrectPos = "rightDot";
+                }
+                else if($("#leftDot").css("background-color") == "rgb(255, 0, 0)") {
+                    ruleCorrectPos = "leftDot";
+                }
+                else if($("#leftDot").css("background-color") == "rgb(0, 255, 0)") {
+                    ruleCorrectPos = "middleDot";
+                }
+            } else if(currentRule == "Rule 3") {
+                keyDot = "rightDot";
+                if($("#rightDot").css("background-color") == "rgb(0, 0, 255)") {
+                    ruleCorrectPos = "rightDot";
+                }
+                else if($("#rightDot").css("background-color") == "rgb(255, 0, 0)") {
+                    ruleCorrectPos = "leftDot";
+                }
+                else if($("#rightDot").css("background-color") == "rgb(0, 255, 0)") {
+                    ruleCorrectPos = "middleDot";
+                }
+            }
+            keyDotColor = $("#"+keyDot).css("background-color");
+            if(Math.random() <= PROB_OF_CORRECT_IF_RULE_CORRECT) {
+                correctPos = ruleCorrectPos;
+            }
+            else {
+                var ruleIncorrectDots = [];
+                if(ruleCorrectPos == "rightDot") {
+                    ruleIncorrectDots = ["leftDot", "middleDot"];
+                }
+                else if(ruleCorrectPos == "middleDot") {
+                    ruleIncorrectDots = ["rightDot", "leftDot"];
+                }
+                else if(ruleCorrectPos == "leftDot") {
+                    ruleIncorrectDots = ["middleDot", "rightDot"]
+                }
+                ruleIncorrectDots = shuffle(ruleIncorrectDots);
+                correctPos = ruleIncorrectDots[0];
+            }
+        }
+        
+        function endTrial() {
+            readyForClicks = false;
+            trialEndTime = new Date().getTime();
+            trialTime = trialEndTime - trialStartTime;
+            data = (data + 
+                    ID + "\t" + 
+                    trialNumber + "\t" + 
+                    currentRule + "\t" + 
+                    nPoints  + "\t" + 
+                    nRuleCorrectFirstClicks + "\t" + 
+                    nRuleCorrectClicks + "\t" + 
+                    nTotalClicks + "\t" + 
+                    trialStartTime + "\t" + 
+                    trialEndTime + "\t" + 
+                    timeToFirstClick + "\t" + 
+                    ruleCorrectPos + "\t" + 
+                    correctPos + "\n");
+            if(nPoints == N_POINTS_TO_WIN) {
+                $("#dotContainer").hide();
+                $("#scoreContainer").hide();
+                $("#instructions").css("display", "block");
+                //$("#instructions").html("You have completed the task. Please let the experimenter know.<br /><br />")
+                $("#instructions").html("You have completed the task. Click on this instruction 3 times to open your results. Once you see your results, copy and paste them into a new text file. Name the text file using a random, 4 digit number. Place the text file in X:\RP 425 Army Learning Climates\Adaptability - Predictive Processing<br /><br />") // TEMP PILOTING ONLY
+                $("#instructions").click(function() {
+                    $("#instructions").click(function() {
+                        $("#instructions").click(function() {
+                            $("#dataBox").show().html(data);
+                        })
+                    })
+                })
+            }
+            else {
+                if(nPoints == N_POINTS_TO_RULE_CHANGE && ruleChanged == false) {
+                    var flag = true;
+                    while(flag) {
+                        newRule = RULES[Math.floor(Math.random() * RULES.length)];
+                        if(newRule != currentRule) {
+                            currentRule = newRule;
+                            ruleChanged = true;
+                            flag = false;
+                        }
+                    }
+                }
+                var incorrectDots = [];
+                if(correctPos == "rightDot") {
+                    incorrectDots = ["leftDot", "middleDot"];
+                }
+                else if(correctPos == "middleDot") {
+                    incorrectDots = ["rightDot", "leftDot"];
+                }
+                else if(correctPos == "leftDot") {
+                    incorrectDots = ["middleDot", "rightDot"]
+                }            
+                var firstIncorrectDotId = "#" + incorrectDots[0];
+                var secondIncorrectDotId = "#" + incorrectDots[1];
+                $(firstIncorrectDotId).delay(500).hide("drop", {direction: "down"}, function() {
+                    $(secondIncorrectDotId).hide("drop",{direction: "down"}, function() {
+                        startTrial();
+                    });
+                });
+            }
+        }
+        
+        $(".dot").on("click", function() {
+            if(readyForClicks) {
+                currentClickTime = new Date().getTime();
+                if((currentClickTime - lastClickTime) > 1000) {
+                    lastClickTime = new Date().getTime();
+                    dotClicked(this);
+                }
+            }
+        });
+        
+        function dotClicked(clickedDot) {
+            nTotalClicks += 1;
+            if(nTotalClicks == 1) {
+                timeToFirstClick = new Date().getTime() - trialStartTime;
+            }
+            if(clickedDot.id == correctPos) {
+                if(clickedDot.id == ruleCorrectPos) {
+                    nRuleCorrectClicks += 1;
+                    if(nTotalClicks == 1) {
+                        nRuleCorrectFirstClicks += 1;
+                    }
+                }
+                else if(clickedDot.id != ruleCorrectPos) {
+                    nRuleIncorrectClicks += 1;
+                }
+                $(clickedDot).hide("explode");
+                nPoints += 1;
+                nCorrectClicks += 1;
+                updateScore(true);
+                endTrial();
+            }
+            else {
+                if(clickedDot.id == ruleCorrectPos) {
+                    nRuleCorrectClicks += 1;
+                }
+                else if(clickedDot.id != ruleCorrectPos) {
+                    nRuleIncorrectClicks += 1;
+                }            
+                $(clickedDot).effect("shake");
+                nPoints -= 1;
+                nIncorrectClicks += 1;
+                updateScore(false);
+            }
+        }
+        
+        function startTask() {
+            $("#instructions").css("display", "none");
+            $("#startButton").css("display", "none");
+            $("#scoreContainer").css("display", "block");
+            $("#dotContainer").css("display", "inline-block");
+            $("#rightDot").hide(0);
+            $("#middleDot").hide(0);
+            $("#leftDot").hide(0);
+            startTrial();
+        }
+        
+        $("#scoreContainer").css("display", "none");
+        $("#dotContainer").css("display", "none");
+        $("#dataBox").css("display", "none");
+        
+        $("#pointsToWin").html(N_POINTS_TO_WIN)
+        $("#probOfRule").html(Math.round((PROB_OF_CORRECT_IF_RULE_CORRECT*100)) + "%")
+        $("#probOfNoRule").html(Math.round(((1-PROB_OF_CORRECT_IF_RULE_CORRECT)*100)) + "%")
+        $("#startButton").click(function() {
+            //openFullscreen();
+            startTask();
+        });
+        
+    });
+
+    </script> 
+</body>
+</html>
