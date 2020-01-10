@@ -186,8 +186,9 @@ DATE:
             DOT_COLOR_1 = "rgb(255, 0, 0)",
             DOT_COLOR_2 = "rgb(0, 255, 0)",
             DOT_COLOR_3 = "rgb(0, 0, 255)",
-            DOT_COLORS = [DOT_COLOR_1, DOT_COLOR_2, DOT_COLOR_3];
-            ID = Math.round(Math.random()*100000)
+            DOT_COLORS = [DOT_COLOR_1, DOT_COLOR_2, DOT_COLOR_3],
+            ID = Math.round(Math.random()*100000),
+            TIME_LIMIT = 2000;
          
         // VARIABLES
         
@@ -211,7 +212,10 @@ DATE:
             trialStartTime = 0,
             trialEndTime = 0,
             timeToFirstClick = 0,
-            data = "id\ttrial_number\tcurrent_rule\tscore\tn_rule_correct_first_clicks\tn_rule_correct_clicks\tn_clicks\tstart_time\tend_time\ttime_to_first_click\trule_correct_dot\tcorrect_dot\n";
+            taskStartTime = 0,
+            taskCurrentTime = 0,
+            totalTaskTime = 0,
+            data = "id\ttrial_number\tcurrent_rule\tscore\tn_rule_correct_first_clicks\tn_rule_correct_clicks\tn_clicks\tstart_time\tend_time\ttime_to_first_click\trule_correct_dot\tcorrect_dot\ttask_time_at_trial_end\n";
             
         // UTILITY FUNCTIONS
         
@@ -335,6 +339,8 @@ DATE:
         
         function endTrial() {
             readyForClicks = false;
+            taskCurrentTime = new Date().getTime();
+            totalTaskTime = taskCurrentTime - taskStartTime;
             trialEndTime = new Date().getTime();
             trialTime = trialEndTime - trialStartTime;
             data = (data + 
@@ -349,20 +355,13 @@ DATE:
                     trialEndTime + "\t" + 
                     timeToFirstClick + "\t" + 
                     ruleCorrectPos + "\t" + 
-                    correctPos + "\n");
+                    correctPos + "\t" +
+                    totalTaskTime + "\n");
             if(nPoints == N_POINTS_TO_WIN) {
-                $("#dotContainer").hide();
-                $("#scoreContainer").hide();
-                $("#instructions").css("display", "block");
-                //$("#instructions").html("You have completed the task. Please let the experimenter know.<br /><br />")
-                $("#instructions").html("You have completed the task. Click on this instruction 3 times to open your results. Once you see your results, copy and paste them into a new text file. Name the text file using a random, 4 digit number. Place the text file in X:\RP 425 Army Learning Climates\Adaptability - Predictive Processing<br /><br />") // TEMP PILOTING ONLY
-                $("#instructions").click(function() {
-                    $("#instructions").click(function() {
-                        $("#instructions").click(function() {
-                            $("#dataBox").show().html(data);
-                        })
-                    })
-                })
+                endTask();
+            }
+            else if(totalTaskTime >= TIME_LIMIT) {
+                endTask();
             }
             else {
                 if(nPoints == N_POINTS_TO_RULE_CHANGE && ruleChanged == false) {
@@ -395,7 +394,6 @@ DATE:
                 });
             }
         }
-        
         $(".dot").on("click", function() {
             if(readyForClicks) {
                 currentClickTime = new Date().getTime();
@@ -405,6 +403,21 @@ DATE:
                 }
             }
         });
+
+        function endTask() {
+            $("#dotContainer").hide();
+            $("#scoreContainer").hide();
+            $("#instructions").css("display", "block");
+            //$("#instructions").html("You have completed the task. Please let the experimenter know.<br /><br />")
+            $("#instructions").html("You have completed the task. Click on this instruction 3 times to open your results. Once you see your results, copy and paste them into a new text file. Name the text file using a random, 4 digit number. Place the text file in X:\RP 425 Army Learning Climates\Adaptability - Predictive Processing<br /><br />") // TEMP PILOTING ONLY
+            $("#instructions").click(function() {
+                $("#instructions").click(function() {
+                    $("#instructions").click(function() {
+                        $("#dataBox").show().html(data);
+                    })
+                })
+            })            
+        }
         
         function dotClicked(clickedDot) {
             nTotalClicks += 1;
@@ -450,6 +463,7 @@ DATE:
             $("#middleDot").hide(0);
             $("#leftDot").hide(0);
             startTrial();
+            taskStartTime = new Date().getTime();
         }
         
         $("#scoreContainer").css("display", "none");
@@ -462,6 +476,7 @@ DATE:
         $("#startButton").click(function() {
             //openFullscreen();
             startTask();
+
         });
         
     });
