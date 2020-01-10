@@ -8,7 +8,7 @@ Cary Stothart
 
 DATE: 
 
-9 Jan 2020
+10 Jan 2020
 
 -->
 <head>
@@ -180,7 +180,6 @@ DATE:
         // TASK SETUP
         
         var N_POINTS_TO_WIN = 30;
-        var N_POINTS_TO_RULE_CHANGE = 99999;
         var PROB_OF_CORRECT_IF_RULE_CORRECT = 1;
         var RULES = ["Rule 1", "Rule 2", "Rule 3"];
         var DOT_COLOR_1 = "rgb(255, 0, 0)";
@@ -188,15 +187,23 @@ DATE:
         var DOT_COLOR_3 = "rgb(0, 0, 255)";
         var DOT_COLORS = [DOT_COLOR_1, DOT_COLOR_2, DOT_COLOR_3];
         var ID = Math.round(Math.random()*100000);
-        var TIME_LIMIT = 1000*60*1;
+        var TIME_LIMIT = 1000*60*20;
         var BLOCK = [
-            [DOT_COLOR_3, DOT_COLOR_2, DOT_COLOR_1],
-            [DOT_COLOR_1, DOT_COLOR_2, DOT_COLOR_3],
-            [DOT_COLOR_3, DOT_COLOR_1, DOT_COLOR_2],
-            [DOT_COLOR_2, DOT_COLOR_1, DOT_COLOR_3],
-            [DOT_COLOR_1, DOT_COLOR_3, DOT_COLOR_2],
-            [DOT_COLOR_2, DOT_COLOR_3, DOT_COLOR_1]
+            ["c1", [DOT_COLOR_3, DOT_COLOR_2, DOT_COLOR_1]],
+            ["c2", [DOT_COLOR_1, DOT_COLOR_2, DOT_COLOR_3]],
+            ["c3", [DOT_COLOR_3, DOT_COLOR_1, DOT_COLOR_2]],
+            ["c4", [DOT_COLOR_2, DOT_COLOR_1, DOT_COLOR_3]],
+            ["c5", [DOT_COLOR_1, DOT_COLOR_3, DOT_COLOR_2]],
+            ["c6", [DOT_COLOR_2, DOT_COLOR_3, DOT_COLOR_1]]
         ];
+        var CORRECT_FIRST_CLICKS = {
+            c1: 0,
+            c2: 0,
+            c3: 0,
+            c4: 0,
+            c5: 0,
+            c6: 0
+        };
          
         // VARIABLES
         
@@ -207,7 +214,6 @@ DATE:
             nRuleCorrectClicks = 0,
             nRuleIncorrectClicks = 0,
             nRuleCorrectFirstClicks = 0,
-            ruleChanged = false,
             currentRule = RULES[Math.floor(Math.random() * RULES.length)],
             ruleCorrectPos = "",
             keyDot = "",
@@ -226,8 +232,12 @@ DATE:
             totalTaskTime = 0,
             currentBlock = [],
             trialDotColors = [],
-            data = "id\ttrial_number\tblock_trial_number\tcurrent_rule\tscore\tn_rule_correct_first_clicks\tn_rule_correct_clicks\tn_clicks\tstart_time\tend_time\ttime_to_first_click\trule_correct_dot\tcorrect_dot\ttask_time_at_trial_end\tleft_dot_color\tmiddle_dot_color\tright_dot_color\n";
+            currentRuleTrials = 0;
+            correctFirstClicks = { ...CORRECT_FIRST_CLICKS },
+            data = "id\ttrial_number\tblock_trial_number\tcurrent_rule\tscore\tn_rule_correctFirstClicks\tn_rule_correct_clicks\tn_clicks\tstart_time\tend_time\ttime_to_first_click\trule_correct_dot\tcorrect_dot\ttask_time_at_trial_end\tleft_dot_color\tmiddle_dot_color\tright_dot_color\n";
             
+            console.log("Starting task with ", currentRule);
+
         // UTILITY FUNCTIONS
         
         function shuffle(array) {
@@ -275,8 +285,38 @@ DATE:
         }
         
         function startTrial() {
+            currentRuleTrials++;
+            var changeRule = false;
+            var totalCorrectFirstClicks = Object.entries(correctFirstClicks)
+                .reduce(function(acc, arr) {
+                    return acc + arr[1];
+            }, 0)  
+            console.log("currentRuleTrials = ", currentRuleTrials, 
+                        "totalCorrectFirstClicks = ", totalCorrectFirstClicks);
+            if(currentRuleTrials > 12 && totalCorrectFirstClicks > 9) {
+                changeRule = true;
+                Object.entries(correctFirstClicks).forEach(function(arr) {
+                    if(arr[1] === 0) {
+                        changeRule = false;
+                    }
+                })
+            }
+            if(changeRule) {
+                var flag = true;
+                while(flag) {
+                    newRule = RULES[Math.floor(Math.random() * RULES.length)];
+                    if(newRule != currentRule) {
+                        currentRule = newRule;
+                        flag = false;
+                        correctFirstClicks = { ...CORRECT_FIRST_CLICKS };
+                        currentRuleTrials = 0;
+                        console.log("Changing rule to ", currentRule);
+                    }
+                }
+            }
+
             if(currentBlock.length == 0) {
-                currentBlock = BLOCK.slice();
+                currentBlock = shuffle(BLOCK.slice());
                 blockTrialNumber = 0;
             }
             trialDotColors = currentBlock.pop();
@@ -289,9 +329,9 @@ DATE:
             nRuleIncorrectClicks = 0;
             timeToFirstClick = 0;
             trialNumber += 1;
-            $("#rightDot").css("background-color", trialDotColors[2]);
-            $("#middleDot").css("background-color", trialDotColors[1]);
-            $("#leftDot").css("background-color", trialDotColors[0]);
+            $("#rightDot").css("background-color", trialDotColors[1][2]);
+            $("#middleDot").css("background-color", trialDotColors[1][1]);
+            $("#leftDot").css("background-color", trialDotColors[1][0]);
             $("#rightDot").delay(500).show("drop", {direction: "up"});
             $("#middleDot").delay(750).show("drop", {direction: "up"});
             $("#leftDot").delay(1000).show("drop", {direction: "up"}, function() {
@@ -373,9 +413,9 @@ DATE:
                     ruleCorrectPos + "\t" + 
                     correctPos + "\t" +
                     totalTaskTime + "\t" +
-                    trialDotColors[0] + "\t" +
-                    trialDotColors[1] + "\t" +
-                    trialDotColors[2] + "\n");
+                    trialDotColors[1][0] + "\t" +
+                    trialDotColors[1][1] + "\t" +
+                    trialDotColors[1][2] + "\n");
             if(nPoints == N_POINTS_TO_WIN) {
                 endTask();
             }
@@ -383,17 +423,6 @@ DATE:
                 endTask();
             }
             else {
-                if(nPoints == N_POINTS_TO_RULE_CHANGE && ruleChanged == false) {
-                    var flag = true;
-                    while(flag) {
-                        newRule = RULES[Math.floor(Math.random() * RULES.length)];
-                        if(newRule != currentRule) {
-                            currentRule = newRule;
-                            ruleChanged = true;
-                            flag = false;
-                        }
-                    }
-                }
                 var incorrectDots = [];
                 if(correctPos == "rightDot") {
                     incorrectDots = ["leftDot", "middleDot"];
@@ -445,9 +474,35 @@ DATE:
             }
             if(clickedDot.id == correctPos) {
                 if(clickedDot.id == ruleCorrectPos) {
-                    nRuleCorrectClicks += 1;
+                    nRuleCorrectClicks++;
                     if(nTotalClicks == 1) {
-                        nRuleCorrectFirstClicks += 1;
+                        nRuleCorrectFirstClicks++;
+                        switch(trialDotColors[0]) {
+                            case "c1":
+                                correctFirstClicks.c1++;
+                                console.log("c1 correct first click", " = ", correctFirstClicks.c1);
+                                break;
+                            case "c2":
+                                correctFirstClicks.c2++;
+                                console.log("c2 correct first click", " = ", correctFirstClicks.c2);
+                                break;
+                            case "c3":
+                                correctFirstClicks.c3++;
+                                console.log("c3 correct first click", " = ", correctFirstClicks.c3);
+                                break;  
+                            case "c4":
+                                correctFirstClicks.c4++;
+                                console.log("c4 correct first click", " = ", correctFirstClicks.c4);
+                                break;  
+                            case "c5":
+                                correctFirstClicks.c5++;
+                                console.log("c5 correct first click", " = ", correctFirstClicks.c5);
+                                break;  
+                            case "c6":
+                                correctFirstClicks.c6++;
+                                console.log("c6 correct first click", " = ", correctFirstClicks.c6);
+                                break;
+                        }
                     }
                 }
                 else if(clickedDot.id != ruleCorrectPos) {
