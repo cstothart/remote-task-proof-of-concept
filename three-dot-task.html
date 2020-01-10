@@ -179,16 +179,24 @@ DATE:
     
         // TASK SETUP
         
-        var N_POINTS_TO_WIN = 30,
-            N_POINTS_TO_RULE_CHANGE = 99999,
-            PROB_OF_CORRECT_IF_RULE_CORRECT = 1,
-            RULES = ["Rule 1", "Rule 2", "Rule 3"],
-            DOT_COLOR_1 = "rgb(255, 0, 0)",
-            DOT_COLOR_2 = "rgb(0, 255, 0)",
-            DOT_COLOR_3 = "rgb(0, 0, 255)",
-            DOT_COLORS = [DOT_COLOR_1, DOT_COLOR_2, DOT_COLOR_3],
-            ID = Math.round(Math.random()*100000),
-            TIME_LIMIT = 2000;
+        var N_POINTS_TO_WIN = 30;
+        var N_POINTS_TO_RULE_CHANGE = 99999;
+        var PROB_OF_CORRECT_IF_RULE_CORRECT = 1;
+        var RULES = ["Rule 1", "Rule 2", "Rule 3"];
+        var DOT_COLOR_1 = "rgb(255, 0, 0)";
+        var DOT_COLOR_2 = "rgb(0, 255, 0)";
+        var DOT_COLOR_3 = "rgb(0, 0, 255)";
+        var DOT_COLORS = [DOT_COLOR_1, DOT_COLOR_2, DOT_COLOR_3];
+        var ID = Math.round(Math.random()*100000);
+        var TIME_LIMIT = 1000*60*1;
+        var BLOCK = [
+            [DOT_COLOR_3, DOT_COLOR_2, DOT_COLOR_1],
+            [DOT_COLOR_1, DOT_COLOR_2, DOT_COLOR_3],
+            [DOT_COLOR_3, DOT_COLOR_1, DOT_COLOR_2],
+            [DOT_COLOR_2, DOT_COLOR_1, DOT_COLOR_3],
+            [DOT_COLOR_1, DOT_COLOR_3, DOT_COLOR_2],
+            [DOT_COLOR_2, DOT_COLOR_3, DOT_COLOR_1]
+        ];
          
         // VARIABLES
         
@@ -206,6 +214,7 @@ DATE:
             keyDotColor = "",
             correctPos = "",
             trialNumber = 0,
+            blockTrialNumber = 0,
             readyForClicks = false,
             lastClickTime = 0,
             currentClickTime = 0,
@@ -215,7 +224,9 @@ DATE:
             taskStartTime = 0,
             taskCurrentTime = 0,
             totalTaskTime = 0,
-            data = "id\ttrial_number\tcurrent_rule\tscore\tn_rule_correct_first_clicks\tn_rule_correct_clicks\tn_clicks\tstart_time\tend_time\ttime_to_first_click\trule_correct_dot\tcorrect_dot\ttask_time_at_trial_end\n";
+            currentBlock = [],
+            trialDotColors = [],
+            data = "id\ttrial_number\tblock_trial_number\tcurrent_rule\tscore\tn_rule_correct_first_clicks\tn_rule_correct_clicks\tn_clicks\tstart_time\tend_time\ttime_to_first_click\trule_correct_dot\tcorrect_dot\ttask_time_at_trial_end\tleft_dot_color\tmiddle_dot_color\tright_dot_color\n";
             
         // UTILITY FUNCTIONS
         
@@ -264,7 +275,12 @@ DATE:
         }
         
         function startTrial() {
-            var dot_colors_copy = DOT_COLORS;
+            if(currentBlock.length == 0) {
+                currentBlock = BLOCK.slice();
+                blockTrialNumber = 0;
+            }
+            trialDotColors = currentBlock.pop();
+            blockTrialNumber = BLOCK.length - currentBlock.length;
             trialTime = 0;
             nTotalClicks = 0;
             nCorrectClicks = 0;
@@ -273,10 +289,9 @@ DATE:
             nRuleIncorrectClicks = 0;
             timeToFirstClick = 0;
             trialNumber += 1;
-            dot_colors_copy = shuffle(dot_colors_copy);
-            $("#rightDot").css("background-color", dot_colors_copy[0]);
-            $("#middleDot").css("background-color", dot_colors_copy[1]);
-            $("#leftDot").css("background-color", dot_colors_copy[2]);
+            $("#rightDot").css("background-color", trialDotColors[2]);
+            $("#middleDot").css("background-color", trialDotColors[1]);
+            $("#leftDot").css("background-color", trialDotColors[0]);
             $("#rightDot").delay(500).show("drop", {direction: "up"});
             $("#middleDot").delay(750).show("drop", {direction: "up"});
             $("#leftDot").delay(1000).show("drop", {direction: "up"}, function() {
@@ -346,6 +361,7 @@ DATE:
             data = (data + 
                     ID + "\t" + 
                     trialNumber + "\t" + 
+                    blockTrialNumber + "\t" + 
                     currentRule + "\t" + 
                     nPoints  + "\t" + 
                     nRuleCorrectFirstClicks + "\t" + 
@@ -356,7 +372,10 @@ DATE:
                     timeToFirstClick + "\t" + 
                     ruleCorrectPos + "\t" + 
                     correctPos + "\t" +
-                    totalTaskTime + "\n");
+                    totalTaskTime + "\t" +
+                    trialDotColors[0] + "\t" +
+                    trialDotColors[1] + "\t" +
+                    trialDotColors[2] + "\n");
             if(nPoints == N_POINTS_TO_WIN) {
                 endTask();
             }
