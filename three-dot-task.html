@@ -24,7 +24,7 @@ DATE:
         color: #FFFFFF;
     }
     #instructions {
-        font-size: 20px;
+        font-size: 18px;
         color: #FFFFFF;
         width: 45%;
         margin: 0 auto;
@@ -129,17 +129,15 @@ DATE:
             
                 You will see a number of displays and each display will contain 3 dots.<br /><br />
                 
-                In each display, 1 dot will be made the correct dot and the other 2 dots will be made the incorrect dots.<br /><br />
+                In each display, 1 dot will be made the correct dot and the other 2 dots will be made the incorrect dots. Everything you need to determine the correct dot is present on the screen.<br /><br />
                 
                 Your task is to click the correct dot.<br /><br />
                 
-                <span class="highlight">For <span id="probOfRule"></span> of displays, the software will choose the correct dot according to a rule, and the rule may change while you complete the task. For the other <span id="probOfNoRule"></span> of displays, the software will choose randomly</span>.<br /><br />
+                <!-- <span class="highlight">For <span id="probOfRule"></span> of displays, the software will choose the correct dot according to a rule, and the rule may change while you complete the task. For the other <span id="probOfNoRule"></span> of displays, the software will choose randomly</span>.<br /><br /> -->
                 
                 You will receive 1 point for every correct dot you click, and you will lose 1 point for every incorrect dot you click.<br /><br />
                 
-                The task will end once you earn <span id="pointsToWin"></span> points.<br /><br />
-		
-		The task will end once you reach a good level of performance<br><br>
+                The task takes about 20 minutes, but it will end earlier if you earn <span id="pointsToWin"></span> points.<br /><br />
                 
                 Press the button below when you are ready to start.
                 
@@ -183,7 +181,7 @@ DATE:
         
         var N_POINTS_TO_WIN = 30,
             N_POINTS_TO_RULE_CHANGE = 99999,
-            PROB_OF_CORRECT_IF_RULE_CORRECT = 0.90,
+            PROB_OF_CORRECT_IF_RULE_CORRECT = 1,
             RULES = ["Rule 1", "Rule 2", "Rule 3"],
             DOT_COLOR_1 = "rgb(255, 0, 0)",
             DOT_COLOR_2 = "rgb(0, 255, 0)",
