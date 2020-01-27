@@ -8,7 +8,7 @@ Cary Stothart
 
 DATE: 
 
-10 Jan 2020
+27 Jan 2020
 
 -->
 <head>
@@ -115,18 +115,18 @@ DATE:
         
             <div id="instructions">
 
-<div class="left smallFont">
-  SURVEY APPROVAL AUTHORITY:
-  U.S. ARMY RECORDS MANAGEMENT AND DECLASSIFICATION AGENCY 
-  SURVEY CONTROL NUMBER: AAHS-RDR-PR-20-010
-  AGENCY IDENTIFIER:  DAPE-ARI 
-  Expiration Date:  12/19/2020
-</div>
-<br /><br />
+                <div class="left smallFont">
+                SURVEY APPROVAL AUTHORITY:
+                U.S. ARMY RECORDS MANAGEMENT AND DECLASSIFICATION AGENCY 
+                SURVEY CONTROL NUMBER: AAHS-RDR-PR-20-010
+                AGENCY IDENTIFIER:  DAPE-ARI 
+                Expiration Date:  12/19/2020
+                </div>
 
+                <br /><br />
 
-		INSTRUCTIONS<br /><br />
-            
+                INSTRUCTIONS<br /><br />
+    
                 You will see a number of displays and each display will contain 3 dots.<br /><br />
                 
                 In each display, 1 dot will be made the correct dot and the other 2 dots will be made the incorrect dots. Everything you need to determine the correct dot is present on the screen.<br /><br />
@@ -140,7 +140,7 @@ DATE:
                 The task takes about 20 minutes, but it will end earlier if you earn <span id="pointsToWin"></span> points.<br /><br />
                 
                 Press the button below when you are ready to start.
-                
+        
                 <br /><br />
             
             </div>
@@ -340,36 +340,36 @@ DATE:
             });
             if(currentRule == "Rule 1") {
                 keyDot = "middleDot";
-                if($("#middleDot").css("background-color") == "rgb(0, 0, 255)") {
-                    ruleCorrectPos = "rightDot";
-                }
-                else if($("#middleDot").css("background-color") == "rgb(255, 0, 0)") {
+                if($("#middleDot").css("background-color") == "rgb(255, 0, 0)") {
                     ruleCorrectPos = "leftDot";
                 }
                 else if($("#middleDot").css("background-color") == "rgb(0, 255, 0)") {
                     ruleCorrectPos = "middleDot";
                 }
-            } else if(currentRule == "Rule 2") {
-                keyDot = "leftDot";
-                if($("#leftDot").css("background-color") == "rgb(0, 0, 255)") {
+                else if($("#middleDot").css("background-color") == "rgb(0, 0, 255)") {
                     ruleCorrectPos = "rightDot";
                 }
-                else if($("#leftDot").css("background-color") == "rgb(255, 0, 0)") {
+            } else if(currentRule == "Rule 2") {
+                keyDot = "middleDot";
+                if($("#middleDot").css("background-color") == "rgb(0, 0, 255)") {
                     ruleCorrectPos = "leftDot";
                 }
-                else if($("#leftDot").css("background-color") == "rgb(0, 255, 0)") {
+                else if($("#middleDot").css("background-color") == "rgb(255, 0, 0)") {
                     ruleCorrectPos = "middleDot";
+                }
+                else if($("#middleDot").css("background-color") == "rgb(0, 255, 0)") {
+                    ruleCorrectPos = "rightDot";
                 }
             } else if(currentRule == "Rule 3") {
-                keyDot = "rightDot";
-                if($("#rightDot").css("background-color") == "rgb(0, 0, 255)") {
-                    ruleCorrectPos = "rightDot";
-                }
-                else if($("#rightDot").css("background-color") == "rgb(255, 0, 0)") {
+                keyDot = "middleDot";
+                if($("#middleDot").css("background-color") == "rgb(0, 255, 0)") {
                     ruleCorrectPos = "leftDot";
                 }
-                else if($("#rightDot").css("background-color") == "rgb(0, 255, 0)") {
+                else if($("#middleDot").css("background-color") == "rgb(0, 0, 255)") {
                     ruleCorrectPos = "middleDot";
+                }
+                else if($("#middleDot").css("background-color") == "rgb(255, 0, 0)") {
+                    ruleCorrectPos = "rightDot";
                 }
             }
             keyDotColor = $("#"+keyDot).css("background-color");
