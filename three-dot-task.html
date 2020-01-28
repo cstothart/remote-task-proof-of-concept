@@ -130,7 +130,7 @@ DATE:
                 You will see a number of displays and each display will contain 3 dots.<br /><br />
                 
                 In each display, 1 dot will be made the correct dot and the other 2 dots will be made the incorrect dots. Everything you need to determine the correct dot is present on the screen.<br /><br />
-                
+               
                 Your task is to click the correct dot.<br /><br />
                 
                 <!-- <span class="highlight">For <span id="probOfRule"></span> of displays, the software will choose the correct dot according to a rule, and the rule may change while you complete the task. For the other <span id="probOfNoRule"></span> of displays, the software will choose randomly</span>.<br /><br /> -->
@@ -139,6 +139,8 @@ DATE:
                 
                 The task takes about 20 minutes, but it will end earlier if you earn <span id="pointsToWin"></span> points.<br /><br />
                 
+                This is a solo task, so do not interrupt or talk to others while you or they are engaged in the task. If you are interested, the experimenter can answer any and all questions after the task is complete.<br /><br /> 
+               
                 Press the button below when you are ready to start.
         
                 <br /><br />
@@ -462,8 +464,8 @@ DATE:
             $("#dotContainer").hide();
             $("#scoreContainer").hide();
             $("#instructions").css("display", "block");
-            //$("#instructions").html("You have completed the task. Please let the experimenter know.<br /><br />")
-            $("#instructions").html("You have completed the task. Click on this instruction 3 times to open your results. Once you see your results, copy and paste them into a new text file. Name the text file using a random, 4 digit number. Place the text file in X:\RP 425 Army Learning Climates\Adaptability - Predictive Processing<br /><br />") // TEMP PILOTING ONLY
+            $("#instructions").html("You have completed the task. Please let the experimenter know.<br /><br />")
+            //$("#instructions").html("You have completed the task. Click on this instruction 3 times to open your results. Once you see your results, copy and paste them into a new text file. Name the text file using a random, 4 digit number. Place the text file in X:\RP 425 Army Learning Climates\Adaptability - Predictive Processing<br /><br />") // TEMP PILOTING ONLY
             $("#instructions").click(function() {
                 $("#instructions").click(function() {
                     $("#instructions").click(function() {
