@@ -293,12 +293,19 @@ DATE:
             var totalCorrectFirstClicks = Object.entries(correctFirstClicks)
                 .reduce(function(acc, arr) {
                     return acc + arr[1];
-            }, 0)  
-            if(currentRuleTrials > 12 && totalCorrectFirstClicks > 9) {
+            }, 0)
+            var oneConfigHasOne = false;
+            if(currentRuleTrials > 12 && totalCorrectFirstClicks >= 11) {
                 changeRule = true;
                 Object.entries(correctFirstClicks).forEach(function(arr) {
                     if(arr[1] === 0) {
                         changeRule = false;
+                    }
+                    else if(arr[1] === 1 && oneConfigHasOne) {
+                        changeRule = false;
+                    }
+                    else if(arr[1] === 1 && !oneConfigHasOne) {
+                        oneConfigHasOne = true;
                     }
                 })
             }
