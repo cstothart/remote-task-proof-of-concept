@@ -8,7 +8,7 @@ Cary Stothart
 
 DATE: 
 
-27 Jan 2020
+28 Jan 2020
 
 -->
 <head>
@@ -179,7 +179,7 @@ DATE:
     
         // TASK SETUP
         
-        var N_POINTS_TO_WIN = 30;
+        var N_POINTS_TO_WIN = 40;
         var PROB_OF_CORRECT_IF_RULE_CORRECT = 1;
         var RULES = ["Rule 1", "Rule 2", "Rule 3"];
         var DOT_COLOR_1 = "rgb(255, 0, 0)";
@@ -285,14 +285,13 @@ DATE:
         }
         
         function startTrial() {
+            console.log(" ");
             currentRuleTrials++;
             var changeRule = false;
             var totalCorrectFirstClicks = Object.entries(correctFirstClicks)
                 .reduce(function(acc, arr) {
                     return acc + arr[1];
             }, 0)  
-            console.log("currentRuleTrials = ", currentRuleTrials, 
-                        "totalCorrectFirstClicks = ", totalCorrectFirstClicks);
             if(currentRuleTrials > 12 && totalCorrectFirstClicks > 9) {
                 changeRule = true;
                 Object.entries(correctFirstClicks).forEach(function(arr) {
@@ -390,6 +389,13 @@ DATE:
                 ruleIncorrectDots = shuffle(ruleIncorrectDots);
                 correctPos = ruleIncorrectDots[0];
             }
+            console.log(correctFirstClicks);
+            console.log("currentRuleTrials = ", currentRuleTrials, 
+                        "totalCorrectFirstClicks = ", totalCorrectFirstClicks);            
+            console.log("rule = ", currentRule);
+            console.log("config = ", trialDotColors[0]);
+            console.log("correct pos = ", correctPos);
+            console.log("rule-correct pos = ", ruleCorrectPos);
         }
         
         function endTrial() {
@@ -470,43 +476,63 @@ DATE:
         function dotClicked(clickedDot) {
             nTotalClicks += 1;
             if(nTotalClicks == 1) {
+                console.log("first dot click for trial")
                 timeToFirstClick = new Date().getTime() - trialStartTime;
+                if(clickedDot.id == ruleCorrectPos) {
+                    nRuleCorrectFirstClicks++;
+                    switch(trialDotColors[0]) {
+                        case "c1":
+                            correctFirstClicks.c1++;
+                            break;
+                        case "c2":
+                            correctFirstClicks.c2++;
+                            break;
+                        case "c3":
+                            correctFirstClicks.c3++;
+                            break;  
+                        case "c4":
+                            correctFirstClicks.c4++;
+                            break;  
+                        case "c5":
+                            correctFirstClicks.c5++;
+                            break;  
+                        case "c6":
+                            correctFirstClicks.c6++;
+                            break;
+                    }
+                }
+                else {
+                    switch(trialDotColors[0]) {
+                        case "c1":
+                            if(correctFirstClicks.c1 > 0) correctFirstClicks.c1--;
+                            break;
+                        case "c2":
+                            if(correctFirstClicks.c2 > 0) correctFirstClicks.c2--;
+                            break;
+                        case "c3":
+                            if(correctFirstClicks.c3 > 0) correctFirstClicks.c3--;
+                            break;  
+                        case "c4":
+                            if(correctFirstClicks.c4 > 0) correctFirstClicks.c4--;
+                            break;  
+                        case "c5":
+                            if(correctFirstClicks.c5 > 0) correctFirstClicks.c5--;
+                            break;  
+                        case "c6":
+                            if(correctFirstClicks.c6 > 0) correctFirstClicks.c6--;
+                            break;
+                    } 
+                }   
             }
             if(clickedDot.id == correctPos) {
                 if(clickedDot.id == ruleCorrectPos) {
+                    console.log("made correct click and rule-correct click")
                     nRuleCorrectClicks++;
-                    if(nTotalClicks == 1) {
-                        nRuleCorrectFirstClicks++;
-                        switch(trialDotColors[0]) {
-                            case "c1":
-                                correctFirstClicks.c1++;
-                                console.log("c1 correct first click", " = ", correctFirstClicks.c1);
-                                break;
-                            case "c2":
-                                correctFirstClicks.c2++;
-                                console.log("c2 correct first click", " = ", correctFirstClicks.c2);
-                                break;
-                            case "c3":
-                                correctFirstClicks.c3++;
-                                console.log("c3 correct first click", " = ", correctFirstClicks.c3);
-                                break;  
-                            case "c4":
-                                correctFirstClicks.c4++;
-                                console.log("c4 correct first click", " = ", correctFirstClicks.c4);
-                                break;  
-                            case "c5":
-                                correctFirstClicks.c5++;
-                                console.log("c5 correct first click", " = ", correctFirstClicks.c5);
-                                break;  
-                            case "c6":
-                                correctFirstClicks.c6++;
-                                console.log("c6 correct first click", " = ", correctFirstClicks.c6);
-                                break;
-                        }
-                    }
                 }
                 else if(clickedDot.id != ruleCorrectPos) {
+                    console.log("made correct click and rule-incorrect click")
                     nRuleIncorrectClicks += 1;
+             
                 }
                 $(clickedDot).hide("explode");
                 nPoints += 1;
@@ -514,11 +540,13 @@ DATE:
                 updateScore(true);
                 endTrial();
             }
-            else {
+            else {                   
                 if(clickedDot.id == ruleCorrectPos) {
-                    nRuleCorrectClicks += 1;
+                    console.log("made incorrect click and rule-correct click")
+                    nRuleCorrectClicks += 1;                    
                 }
                 else if(clickedDot.id != ruleCorrectPos) {
+                    console.log("made incorrect click and rule-incorrect click")
                     nRuleIncorrectClicks += 1;
                 }            
                 $(clickedDot).effect("shake");
