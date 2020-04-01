@@ -8,7 +8,7 @@ Cary Stothart
 
 DATE: 
 
-28 Jan 2020
+1 Apr 2020
 
 -->
 <head>
@@ -115,16 +115,6 @@ DATE:
         
             <div id="instructions">
 
-                <div class="left smallFont">
-                SURVEY APPROVAL AUTHORITY:
-                U.S. ARMY RECORDS MANAGEMENT AND DECLASSIFICATION AGENCY 
-                SURVEY CONTROL NUMBER: AAHS-RDR-PR-20-010
-                AGENCY IDENTIFIER:  DAPE-ARI 
-                Expiration Date:  12/19/2020
-                </div>
-
-                <br /><br />
-
                 INSTRUCTIONS<br /><br />
     
                 You will see a number of displays and each display will contain 3 dots.<br /><br />
@@ -181,7 +171,7 @@ DATE:
     
         // TASK SETUP
         
-        var N_POINTS_TO_WIN = 40;
+        var N_POINTS_TO_WIN = -10;
         var PROB_OF_CORRECT_IF_RULE_CORRECT = 1;
         var RULES = ["Rule 1", "Rule 2", "Rule 3"];
         var DOT_COLOR_1 = "rgb(255, 0, 0)";
@@ -431,7 +421,7 @@ DATE:
                     trialDotColors[1][0] + "\t" +
                     trialDotColors[1][1] + "\t" +
                     trialDotColors[1][2] + "\n");
-            if(nPoints == N_POINTS_TO_WIN) {
+            if(nPoints >= N_POINTS_TO_WIN) {
                 endTask();
             }
             else if(totalTaskTime >= TIME_LIMIT) {
@@ -471,15 +461,9 @@ DATE:
             $("#dotContainer").hide();
             $("#scoreContainer").hide();
             $("#instructions").css("display", "block");
-            $("#instructions").html("You have completed the task. Please let the experimenter know.<br /><br />")
+            $("#instructions").html("You have completed the task. Please email the content of the box below to bob.belcher@mail.mil<br /><br />")
             //$("#instructions").html("You have completed the task. Click on this instruction 3 times to open your results. Once you see your results, copy and paste them into a new text file. Name the text file using a random, 4 digit number. Place the text file in X:\RP 425 Army Learning Climates\Adaptability - Predictive Processing<br /><br />") // TEMP PILOTING ONLY
-            $("#instructions").click(function() {
-                $("#instructions").click(function() {
-                    $("#instructions").click(function() {
-                        $("#dataBox").show().html(data);
-                    })
-                })
-            })            
+            $("#dataBox").show().html(data);           
         }
         
         function dotClicked(clickedDot) {
